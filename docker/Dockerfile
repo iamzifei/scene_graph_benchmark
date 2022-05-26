@@ -16,7 +16,7 @@ RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selectio
 RUN apt-get update -y \
     && apt-get install -y apt-utils git curl ca-certificates bzip2 cmake tree htop bmon iotop g++ \
     && apt-get install -y libglib2.0-0 libsm6 libxext6 libxrender-dev libyaml-dev vim zsh wget htop tmux \
-    && apt-get install -y ffmpeg libgl-dev unzip
+    && apt-get install -y ffmpeg libgl-dev unzip zip
 
 # Install Miniconda
 RUN curl -so /miniconda.sh https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh \
@@ -77,21 +77,20 @@ RUN echo """syntax on\nfiletype indent on\nset autoindent\nset number\ncolorsche
 
 CMD [ "zsh" ]
 
-RUN git clone https://github.com/iamzifei/scene_graph_benchmark.git \
-    && cd scene_graph_benchmark
+RUN git clone https://github.com/iamzifei/scene_graph_benchmark.git
+
+WORKDIR /scene_graph_benchmark
 
 # download the waterbird dataset and unzip it
 RUN gdown 1TKiSXtY-x4Q51KxCyLL2QMoDKSU_1ku9
 RUN unzip waterbirds.zip
 
-RUN mkdir pretrained_model && cd pretrained_model
-RUN wget https://penzhanwu2.blob.core.windows.net/sgg/sgg_benchmark/vinvl_model_zoo/vinvl_vg_x152c4.pth
-RUN cd ..
-RUN mkdir visualgenome && cd visualgenome
-RUN wget https://penzhanwu2.blob.core.windows.net/sgg/sgg_benchmark/vinvl_model_zoo/VG-SGG-dicts-vgoi6-clipped.json
-RUN cd ..
+RUN rm waterbirds.zip
 
-WORKDIR /scene_graph_benchmark
+RUN mkdir pretrained_model
+RUN wget -P ./pretrained_model https://penzhanwu2.blob.core.windows.net/sgg/sgg_benchmark/vinvl_model_zoo/vinvl_vg_x152c4.pth
+RUN mkdir visualgenome
+RUN wget -P ./visualgenome https://penzhanwu2.blob.core.windows.net/sgg/sgg_benchmark/vinvl_model_zoo/VG-SGG-dicts-vgoi6-clipped.json
 
 # finish build the image, the following code is for running inside the container
 
